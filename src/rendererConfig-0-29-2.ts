@@ -1,4 +1,8 @@
 // import ReactReconciler from 'react-reconciler';
+/*
+    "react-reconciler": "0.29.2",
+    "react": "18.3.1"
+*/
 import { OWN_PROP_KEYS } from './manager/lifecycle';
 import { createElement } from './manager/element';
 

@@ -1,3 +1,7 @@
+/*
+    "react-reconciler": "0.32.0",
+    "react": "19.1.1"
+*/
 import { Lifecycle, OWN_PROP_KEYS } from './manager/lifecycle';
 import type { TreeNode } from './manager/tree'
 
