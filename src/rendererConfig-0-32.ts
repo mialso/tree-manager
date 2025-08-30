@@ -184,6 +184,9 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
                     ? (callback) => localPromise.resolve(null).then(callback).catch(handleErrorInNextTick)
                     : scheduleTimeout
         }
+
+        // TODO
+        // onUncaughtError: () => {},
     return hostConfig;
 }
 
