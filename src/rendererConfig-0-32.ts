@@ -135,8 +135,9 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
             parentInstance.appendChild(child);
             child.setParent(parentInstance);
         },
-        insertInContainerBefore: (): void =>  {
-            throw new Error('not implemented')
+        insertInContainerBefore: (parentInstance: Instance, child: Instance, _afterChild: Instance): void =>  {
+            parentInstance.appendChild(child);
+            child.setParent(parentInstance);
         },
         removeChild: (parentInstance: Instance, child: Instance): void => {
             // TODO: not expected to traverse child tree here
@@ -145,7 +146,7 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
             }
             parentInstance.removeChild(child);
         },
-        removeChildFromContainer: (): void => {
+        removeChildFromContainer: (...ppp): void => {
             throw new Error('not implemented')
         },
         resetTextContent: (): void => undefined,
@@ -189,8 +190,6 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
                     : scheduleTimeout
         }
 
-        // TODO
-        // onUncaughtError: () => {},
     return hostConfig;
 }
 

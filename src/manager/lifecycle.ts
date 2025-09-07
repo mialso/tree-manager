@@ -25,7 +25,7 @@ export const initLifecycle = <P>(props: P, ext?: LifecycleExt<P>): ElementCreate
     return (base) => {
         const state = {
             props,
-            mounted: false,
+            mounted: base.type === 'root' || false,
             destroyed: false,
         }
         const log = (base: TreeNode<P>, text: string) => {
