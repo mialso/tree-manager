@@ -6,6 +6,7 @@ export type NodeConfig = {
 }
 export type NodeState<P> = {
     type: string
+    name?: string
     children: TreeNode<P>[]
     parent: unknown
     depth: number
@@ -17,6 +18,8 @@ export type TreeNode<P = unknown> = {
     getChildren: () => TreeNode<unknown>[]
     getParent: () => unknown
     setParent: (node: TreeNode<unknown>) => void
+    setName: (name: string) => void
+    getDisplayName: (nameOnly?: boolean) => string
     setDepth: (depth: number, source: string) => void
     getDepth: () => number
     appendChild: (node: TreeNode<P>) => void
@@ -38,13 +41,16 @@ type TreeNodeCreate<P> = (config: NodeConfig) => TreeNode<P>
 export function getSpaces(num = 0) {
     return Array(num * 4).fill(' ').join('');
 }
-export const nodeTitle = (state: { type: string }) => `<${state.type || 'unknown'}>`;
+export const nodeTitle = (state: { type: string, name?: string }) => (
+    `<${state.type || 'unknown'}${state.name ? `::${state.name}`: ''}>`
+)
 export const nodeBaseLog = (state: NodeState<unknown>) => `${getSpaces(state.depth)}Node<${nodeTitle(state)}>`;
 
 export const initTreeNode = <P>(ext?: TreeNodeExt<P>): TreeNodeCreate<P> => {
     return ({ type }: NodeConfig) => {
         const state: NodeState<P> = {
             type,
+            name: '',
             parent: null,
             children: [],
             depth: 0,
@@ -66,15 +72,34 @@ export const initTreeNode = <P>(ext?: TreeNodeExt<P>): TreeNodeCreate<P> => {
                 if (parentLogSeverity && parentLogSeverity > state.logSeverity && !ext?.logSeverity) {
                     state.logSeverity = parentLogSeverity
                 }
-                log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: setParent: ${nodeTitle(node)}`);
+                if (!state.name) {
+                    const parentName = node.getDisplayName(true)
+                    if (parentName) {
+                        state.name = `^${parentName}`
+                    }
+                }
+                log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: setParent: ${node.getDisplayName()}`);
                 state.parent = node
+                // setDepth here, doesn't work at appendChild
+                state.depth = node.getDepth() + 1
+                if (state.depth && Array.isArray(state.children)) {
+                    state.children.forEach((child) => {
+                      child.setDepth(state.depth + 1, `parent::setParent ${nodeTitle(state)}`)
+                      // child.setLogSeverity(state.logSeverity)
+                    });
+                }
             },
+            setName: (name: string) => {
+                state.name = name
+                // log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: setName: ${name}`);
+            },
+            getDisplayName: (nameOnly = false) => nameOnly ? state.name : nodeTitle(state),
             getDepth: () => state.depth,
             setDepth: (value: number, source: string) => {
                 if (state.depth === value) {
                     return;
                 }
-                // log(LOG_LEVEL.TRACE, `set depth: ${value}:${source}`);
+                log(LOG_LEVEL.TRACE, `set depth: ${value}:${source}, children=${state.children.length}`);
                 if (state.depth > 10) {
                     log(LOG_LEVEL.ERROR, `exceed depth: ${value}:${source}`);
                     return
@@ -82,24 +107,26 @@ export const initTreeNode = <P>(ext?: TreeNodeExt<P>): TreeNodeCreate<P> => {
                 state.depth = value;
                 if (Array.isArray(state.children)) {
                     state.children.forEach((child) => {
-                      child.setDepth(value + 1, `setDepth<${state.type}>`)
+                      child.setDepth(value + 1, `parent::setDepth ${nodeTitle(state)}`)
                       // child.setLogSeverity(state.logSeverity)
                     });
                 }
             },
             appendChild: (child) => {
-                log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: appendChild: ${nodeTitle(child)}`);
+                log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: appendChild: ${child.getDisplayName()}, children=${state.children.length}`);
                 state.children.push(child);
+                /*
                 if (state.depth && Array.isArray(state.children)) {
                     state.children.forEach((child) => {
-                      child.setDepth(state.depth + 1, `appendChild ${state.type}`)
+                      child.setDepth(state.depth + 1, `parent::appendChild${nodeTitle(state)}`)
                       // child.setLogSeverity(state.logSeverity)
                     });
                 }
+                */
                 ext?.appendChild && ext.appendChild(child)
             },
             removeChild: (child) => {
-                log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: removeChild: ${nodeTitle(child)}`);
+                log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: removeChild: ${child.getDisplayName()}`);
                 state.children = state.children.filter((item) => item === child);
                 ext?.removeChild && ext.removeChild(child)
             },
