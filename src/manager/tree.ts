@@ -44,7 +44,7 @@ export function getSpaces(num = 0) {
 export const nodeTitle = (state: { type: string, name?: string }) => (
     `<${state.type || 'unknown'}${state.name ? `::${state.name}`: ''}>`
 )
-export const nodeBaseLog = (state: NodeState<unknown>) => `${getSpaces(state.depth)}Node<${nodeTitle(state)}>`;
+export const nodeBaseLog = (state: NodeState<unknown>) => `${getSpaces(state.depth)}<${nodeTitle(state)}>`;
 
 export const initTreeNode = <P>(ext?: TreeNodeExt<P>): TreeNodeCreate<P> => {
     return ({ type }: NodeConfig) => {
@@ -56,12 +56,12 @@ export const initTreeNode = <P>(ext?: TreeNodeExt<P>): TreeNodeCreate<P> => {
             depth: 0,
             logSeverity: ext?.logSeverity || LOG_LEVEL.ERROR,
         };
-        // console.info(`${elementBaseLog(state)}: (init)`);
         const log = (level: LogSeverity, message: string, ...rest: unknown[]) => {
             if (!(level && state.logSeverity >= level && message)) return
-            if (level >= LOG_LEVEL.INFO) return console.info(message, ...rest)
-            if (level >= LOG_LEVEL.WARN) return console.warn(message, ...rest)
-            console.error(message, ...rest)
+            const nodeBase = nodeBaseLog(state)
+            if (level >= LOG_LEVEL.INFO) return console.info(`${nodeBase} ${message}`, ...rest)
+            if (level >= LOG_LEVEL.WARN) return console.warn(`${nodeBase} ${message}`, ...rest)
+            console.error(`${nodeBase} ${message}`, ...rest)
         }
         return ({
             type: state.type,
@@ -78,7 +78,7 @@ export const initTreeNode = <P>(ext?: TreeNodeExt<P>): TreeNodeCreate<P> => {
                         state.name = `^${parentName}`
                     }
                 }
-                log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: setParent: ${node.getDisplayName()}`);
+                // log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: setParent: ${node.getDisplayName()}`);
                 state.parent = node
                 // setDepth here, doesn't work at appendChild
                 state.depth = node.getDepth() + 1
@@ -99,7 +99,7 @@ export const initTreeNode = <P>(ext?: TreeNodeExt<P>): TreeNodeCreate<P> => {
                 if (state.depth === value) {
                     return;
                 }
-                log(LOG_LEVEL.TRACE, `set depth: ${value}:${source}, children=${state.children.length}`);
+                // log(LOG_LEVEL.TRACE, `set depth: ${value}:${source}, children=${state.children.length}`);
                 if (state.depth > 10) {
                     log(LOG_LEVEL.ERROR, `exceed depth: ${value}:${source}`);
                     return
@@ -113,7 +113,7 @@ export const initTreeNode = <P>(ext?: TreeNodeExt<P>): TreeNodeCreate<P> => {
                 }
             },
             appendChild: (child) => {
-                log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: appendChild: ${child.getDisplayName()}, children=${state.children.length}`);
+                log(LOG_LEVEL.DEBUG, `appendChild: ${child.getDisplayName()}, children=${state.children.length}`);
                 state.children.push(child);
                 /*
                 if (state.depth && Array.isArray(state.children)) {
@@ -126,13 +126,13 @@ export const initTreeNode = <P>(ext?: TreeNodeExt<P>): TreeNodeCreate<P> => {
                 ext?.appendChild && ext.appendChild(child)
             },
             removeChild: (child) => {
-                log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: removeChild: ${child.getDisplayName()}`);
+                log(LOG_LEVEL.DEBUG, `removeChild: ${child.getDisplayName()}`);
                 state.children = state.children.filter((item) => item === child);
                 ext?.removeChild && ext.removeChild(child)
             },
             setLogSeverity: (logSeverity: LogSeverity) => {
                 if (!ext?.logSeverity) {
-                    log(LOG_LEVEL.TRACE, `${nodeBaseLog(state)}: setLogSeverity: ${logSeverity}`);
+                    log(LOG_LEVEL.TRACE, `setLogSeverity: ${logSeverity}`);
                     state.logSeverity = logSeverity
                 }
                 return state.logSeverity

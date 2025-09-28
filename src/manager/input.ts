@@ -26,7 +26,7 @@ export const initInput = <P extends InputProps>(ext?: P): InputCreate<P> => {
             ...base,
             capture: (data) => {
                 if (!base.getNodeLive()) {
-                    base.log(LOG_LEVEL.ERROR, `invalid capture lifecycle <${base.type}>`)
+                    base.log(LOG_LEVEL.ERROR, 'invalid capture lifecycle')
                     return
                 }
                 const prevent = !!(ext && ext.onCtrl && ext.onCtrl(data))
@@ -34,7 +34,7 @@ export const initInput = <P extends InputProps>(ext?: P): InputCreate<P> => {
                 if (prevent) {
                     return
                 }
-                base.log(LOG_LEVEL.DEBUG, `capture <${base.type}>`,  data)
+                base.log(LOG_LEVEL.TRACE, 'capture data=',  data)
                 base.getChildren().forEach((child) => {
                     if (isInput(child)) {
                         child.capture(data)
@@ -43,15 +43,14 @@ export const initInput = <P extends InputProps>(ext?: P): InputCreate<P> => {
             },
             bubble: (data) => {
                 if (!base.getNodeLive()) {
-                    base.log(LOG_LEVEL.ERROR, `invalid bubble lifecycle <${base.type}>`)
+                    base.log(LOG_LEVEL.ERROR, 'invalid bubble lifecycle')
                     return
                 }
                 const prevent = !!(ext && ext.onData && ext.onData(data))
                 if (prevent) {
-                    // console.log(`bubble [PREVENT] <${base.type}>`, data)
                     return
                 }
-                base.log(LOG_LEVEL.DEBUG, `bubble <${base.type}>`, data)
+                base.log(LOG_LEVEL.TRACE, 'bubble data=', data)
                 const parent = base.getParent()
                 if (isInput(parent)) {
                     parent.bubble(data)

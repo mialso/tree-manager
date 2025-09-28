@@ -31,9 +31,6 @@ export const initLifecycle = <P extends { name?: string }>(props: P, ext?: Lifec
             mounted: base.type === 'root' || false,
             destroyed: false,
         }
-        const logTrace = (base: TreeNode<P>, text: string) => {
-            base.log(LOG_LEVEL.TRACE, `${elementBaseLog(base.getDepth, base.getDisplayName())}: ${text}`);
-        }
         const getNodeLive = () => state.mounted && !state.destroyed
         // const name = props.name || props.key
         const name = props.name || (ext?.getName && ext.getName())
@@ -45,14 +42,14 @@ export const initLifecycle = <P extends { name?: string }>(props: P, ext?: Lifec
             getProps: () => state.props,
             getNodeLive,
             commitMount: () => {
-                logTrace(base, 'commitMount');
+                base.log(LOG_LEVEL.TRACE, 'commitMount');
                 state.mounted = true
                 ext?.commitMount && ext.commitMount()
             },
             commitUpdate: (newProps) => {
                 if (!getNodeLive()) {
                     const errorText = `invalid update mounted=${state.mounted} destroyed=${state.destroyed}`
-                    base.log(LOG_LEVEL.ERROR, `${elementBaseLog(base.getDepth, base.getDisplayName())}: ${errorText}`)
+                    base.log(LOG_LEVEL.ERROR, errorText)
                     return
                 }
                 if (typeof newProps !== 'object') {
@@ -66,12 +63,12 @@ export const initLifecycle = <P extends { name?: string }>(props: P, ext?: Lifec
                         }
                         return acc;
                     }, '');
-                logTrace(base, `commitUpdate: ${propsString}`);
+                base.log(LOG_LEVEL.TRACE, `commitUpdate: ${propsString}`);
                 state.props = newProps
                 ext?.commitUpdate && ext.commitUpdate(newProps)
             },
             destroy: () => {
-                logTrace(base, 'destroy')
+                base.log(LOG_LEVEL.TRACE, 'destroy')
                 state.destroyed = true
                 const children = base.getChildren()
                 // TODO: not required to traverse children?
