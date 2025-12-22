@@ -1,5 +1,5 @@
 import React from 'react';
-import { useModuleLifecycle } from '../manager/hooks';
+import { useModuleLifecycle } from '../hooks';
 
 export function PluginOne({ data }) {
     useModuleLifecycle('pluginOne');
