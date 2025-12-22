@@ -7,8 +7,8 @@
         "build": "webpack --env dev",
         "build:prod": "webpack --env prod",
         "compile": "swc ./src --config-file .swcrc -d ./dist",
-        "exec": "node build/bundle.js",
-        "exec:debug": "node --inspect-brk build/bundle.js",
+        "exec": "node dist/bundle.js",
+        "exec:debug": "node --inspect-brk dist/bundle.js",
         "dep:graph": "npx madge --image graph.svg src/",
         "lint": "npx eslint src/",
         "test": "echo \"Error: no test specified\" && exit 1"
