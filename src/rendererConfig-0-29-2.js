@@ -3,10 +3,10 @@
     "react-reconciler": "0.29.2",
     "react": "18.3.1"
 */
-import { OWN_PROP_KEYS } from './manager/lifecycle';
-import { createElement } from './manager/element';
+import { OWN_PROP_KEYS } from './lifecycle';
+import { createElement } from './element';
 
-export const instanceCreator = ({ getInstance }) => (type: string, props, rootContainer, _a, _fiberNode) => {
+export const instanceCreator = ({ getInstance }) => (type, props, rootContainer, _a, _fiberNode) => {
     // console.log(`instanceCreator`, { key: _fiberNode.key })
     const instance = getInstance(type, props, rootContainer)
     if (!instance) {

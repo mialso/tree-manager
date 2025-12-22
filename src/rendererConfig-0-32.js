@@ -2,8 +2,10 @@
     "react-reconciler": "0.32.0",
     "react": "19.1.1"
 */
-import { Lifecycle, OWN_PROP_KEYS } from './manager/lifecycle';
-import type { TreeNode } from './manager/tree'
+/** @import {Lifecycle, TreeNode} from './types.d.ts' */
+import { OWN_PROP_KEYS } from './lifecycle';
+
+/** @typedef {TreeNode & Lifecycle} Instance */
 
 export const instanceCreator = ({ getInstance }) => (type: string, props: unknown, rootContainer: Instance, hostContext: unknown, internalInstanceHandle: Object) => {
     // console.log(`instanceCreator`, { key: _fiberNode.key })
@@ -15,7 +17,6 @@ export const instanceCreator = ({ getInstance }) => (type: string, props: unknow
     return instance
 }
 
-type Instance = TreeNode & Lifecycle
 
 const hostContext = Object.freeze({})
 const scheduleTimeout = typeof setTimeout === 'function' ? setTimeout : undefined
@@ -44,7 +45,8 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
         prepareForCommit: (_containerInfo) => null,
         resetAfterCommit: () => undefined,
         createInstance: instanceCreator({ getInstance }),
-        cloneMutableInstance: (instance: Instance, _keepChildren: boolean): Instance => {
+        /** @type {(instance: Instance, keepChildren: boolean) => Instance} */
+        cloneMutableInstance: (instance, keepChildren) => {
             // TODO: need an implemenation?
             console.log(`cloneMutableInstance TODO`)
             return instance
@@ -107,20 +109,24 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
         //      Mutation
         //     (optional)
         // -------------------
-        appendChild: (parentInstance: Instance, child: Instance): void => {
+        /** @type {(parentInstance: Instance, child: Instance) => void} */
+        appendChild: (parentInstance, child) => {
             parentInstance.appendChild(child);
             child.setParent(parentInstance);
         },
-        appendChildToContainer: (container, child: Instance): void => {
+        /** @type {(container: unknown, child: Instance) => void} */
+        appendChildToContainer: (container, child) => {
             child.setDepth(1, 'appendChildToContainer')
             container.appendChild(child);
             // TODO: should set parent?
         },
         commitTextUpdate: () => {},
-        commitMount: (instance: Instance, _type: string, _newProps: unknown, internalInstanceHandle: Object): void => {
+        /** @type {(instance: Instance, type: string, newProps: unknown, internalInstanceHandle: Object) => void} */
+        commitMount: (instance, type, newProps, internalInstanceHandle) => {
             instance.commitMount();
         },
-        commitUpdate: (instance: Instance, _type: string, prevProps: unknown, nextProps: unknown, internalInstanceHandle: Object): void => {
+        /** @type {(instance: Instance, type: string, prevProps: unknown, nextProps: unknown, internalInstanceHandle: Object) => void} */
+        commitUpdate: (instance, type, prevProps, nextProps, internalInstanceHandle) => {
             // instance.commitUpdate(nextProps);
             const hasUpdate = Object.keys(nextProps)
                 .filter((key) => !OWN_PROP_KEYS.includes(key))
@@ -131,29 +137,38 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
                 instance.commitUpdate(nextProps);
             }
         },
-        insertBefore: (parentInstance: Instance, child: Instance, _beforeChild: Instance): void => {
+        /** @type {(parentInstance: Instance, child: Instance, _beforeChild: Instance) => void} */
+        insertBefore: (parentInstance, child, _beforeChild) => {
             parentInstance.appendChild(child);
             child.setParent(parentInstance);
         },
-        insertInContainerBefore: (parentInstance: Instance, child: Instance, _afterChild: Instance): void =>  {
+        /** @type {(parentInstance: Instance, child: Instance, _afterChild: Instance) => void} */
+        insertInContainerBefore: (parentInstance, child, _afterChild) =>  {
             parentInstance.appendChild(child);
             child.setParent(parentInstance);
         },
-        removeChild: (parentInstance: Instance, child: Instance): void => {
+        /** @type {(parentInstance: Instance, child: Instance) => void} */
+        removeChild: (parentInstance, child) => {
             // TODO: not expected to traverse child tree here
             if (typeof child.destroy === 'function') {
                 child.destroy();
             }
             parentInstance.removeChild(child);
         },
-        removeChildFromContainer: (...ppp): void => {
+        /** @type {() => void} */
+        removeChildFromContainer: (...ppp) => {
             throw new Error('not implemented')
         },
-        resetTextContent: (): void => undefined,
-        hideInstance: (): void => undefined,
-        hideTextInstance: (): void => undefined,
-        unhideInstance: (): void => undefined,
-        unhideTextInstance: (): void => undefined,
+        /** @type {() => void} */
+        resetTextContent: () => undefined,
+        /** @type {() => void} */
+        hideInstance: () => undefined,
+        /** @type {() => void} */
+        hideTextInstance: () => undefined,
+        /** @type {() => void} */
+        unhideInstance: () => undefined,
+        /** @type {() => void} */
+        unhideTextInstance: () => undefined,
         applyViewTransitionName: null,
         restoreViewTransitionName: null,
         cancelViewTransitionName: null,
@@ -171,7 +186,8 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
         stopViewTransition: null,
         getCurrentGestureOffset: null,
         createViewTransitionInstance: null,
-        clearContainer: (container): void => undefined,
+        /** @type {(container: unknown) => void} */
+        clearContainer: (container) => undefined,
         createFragmentInstance: null,
         updateFragmentInstanceFiber: null,
         commitNewChildToFragmentInstance: null,
