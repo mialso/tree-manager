@@ -89,13 +89,13 @@ export const initTreeNode = (ext) => ({ type }) => {
             log(LOG_LEVEL.DEBUG, `appendChild: ${child.getDisplayName()}, children=${state.children.length}`);
             state.children.push(child);
             /*
-            if (state.depth && Array.isArray(state.children)) {
-                state.children.forEach((child) => {
-                    child.setDepth(state.depth + 1, `parent::appendChild${nodeTitle(state)}`)
-                    // child.setLogSeverity(state.logSeverity)
-                });
-            }
-            */
+             *if (state.depth && Array.isArray(state.children)) {
+             *    state.children.forEach((child) => {
+             *        child.setDepth(state.depth + 1, `parent::appendChild${nodeTitle(state)}`)
+             *        // child.setLogSeverity(state.logSeverity)
+             *    });
+             *}
+             */
             ext?.appendChild && ext.appendChild(child)
         },
         removeChild: (child) => {

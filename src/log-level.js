@@ -1,6 +1,6 @@
 /** @import {LogSeverity} from './types' */
 
-/** @type {Record<string, LogSeverity} */
+/** @type {Record<string, LogSeverity>} */
 export const LOG_LEVEL = {
     FATAL: 1,
     ERROR: 2,

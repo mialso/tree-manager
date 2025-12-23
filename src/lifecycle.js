@@ -1,4 +1,4 @@
-/** @import {TreeNode, InitLifecycle} from './types' */
+/** @import {InitLifecycle} from './types' */
 
 import { LOG_LEVEL } from './log-level'
 import { getSpaces } from './tree'

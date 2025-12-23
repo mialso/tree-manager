@@ -1,13 +1,16 @@
+/* eslint-disable no-unused-vars */
 /*
-    "react-reconciler": "0.32.0",
-    "react": "19.1.1"
-*/
-/** @import {Lifecycle, TreeNode} from './types.d.ts' */
-import { OWN_PROP_KEYS } from './lifecycle';
+ *"react-reconciler": "0.32.0",
+ *"react": "19.1.1"
+ */
+/** @import {LifecycleExt, TreeNode} from './types' */
+import { OWN_PROP_KEYS } from './lifecycle'
+import { createElement } from './element'
 
-/** @typedef {TreeNode & Lifecycle} Instance */
+/** @typedef {TreeNode & LifecycleExt} Instance */
 
-export const instanceCreator = ({ getInstance }) => (type: string, props: unknown, rootContainer: Instance, hostContext: unknown, internalInstanceHandle: Object) => {
+/** @type {(p: { getInstance: (type: string, props: unknown, rootContainer: Instance) => Instance }) => (type: string, props: unknown, rootContainer: Instance, hostContext: unknown, internalInstanceHandle: Object) => Instance} */
+export const instanceCreator = ({ getInstance }) => (type, props, rootContainer, hostContext, internalInstanceHandle) => {
     // console.log(`instanceCreator`, { key: _fiberNode.key })
     const instance = getInstance(type, props, rootContainer)
     if (!instance) {
@@ -22,15 +25,15 @@ const hostContext = Object.freeze({})
 const scheduleTimeout = typeof setTimeout === 'function' ? setTimeout : undefined
 export const cancelTimeout = typeof clearTimeout === 'function' ? clearTimeout : undefined
 /*
-const scheduleTimeout = (fn) => fn()
-export const cancelTimeout = () => {}
-*/
+ *const scheduleTimeout = (fn) => fn()
+ *export const cancelTimeout = () => {}
+ */
 export const noTimeout = -1;
 const localPromise = typeof Promise === 'function' ? Promise : undefined
 function handleErrorInNextTick(error) {
-  setTimeout(() => {
-    throw error;
-  });
+    setTimeout(() => {
+        throw error;
+    });
 }
 
 export function createHostConfig ({ getInstance, DefaultEventPriority }) {
@@ -48,18 +51,21 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
         /** @type {(instance: Instance, keepChildren: boolean) => Instance} */
         cloneMutableInstance: (instance, keepChildren) => {
             // TODO: need an implemenation?
-            console.log(`cloneMutableInstance TODO`)
+            console.log('cloneMutableInstance TODO')
             return instance
         },
-        appendInitialChild: (parentInstance: Instance, child: Instance) => {
+        /** @type {(parentInstancve: Instance, child: Instance) => void} */
+        appendInitialChild: (parentInstance, child) => {
             child.setParent(parentInstance)
             return parentInstance.appendChild(child)
         },
-        finalizeInitialChildren: (node: Instance, type: string, props: unknown, hostContext: unknown) => {
+        /** @type {(node: Instance, type: string, props: unknown, hostContext: unknown) => boolean} */
+        finalizeInitialChildren: (node, type, props, hostContext) => {
             // to receive "commitMount"
             return true;
         },
-        shouldSetTextContent: (type: string, props: unknown) => false,
+        /** @type {(type: string, props: unknown) => boolean} */
+        shouldSetTextContent: (type, props) => false,
         createTextInstance: () => {
             throw new Error('not implemented')
         },
@@ -79,22 +85,29 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
         getInstanceFromNode: null,
         beforeActiveInstanceBlur: null,
         afterActiveInstanceBlur: null,
-        preparePortalMount: (): void => undefined,
+        /** @type {() => void} */
+        preparePortalMount: () => undefined,
         prepareScopeUpdate: null,
         getInstanceFromScope: null,
 
-        setCurrentUpdatePriority: (): void => undefined,
+        /** @type {() => void} */
+        setCurrentUpdatePriority: () => undefined,
         getCurrentUpdatePriority: () => DefaultEventPriority,
         resolveUpdatePriority: () => DefaultEventPriority,
-        trackSchedulerEvent: (): void => undefined,
+        /** @type {() => void} */
+        trackSchedulerEvent: () => undefined,
         resolveEventType: null, // () => string | null
         resolveEventTimeStamp: null, // () => number
         shouldAttemptEagerTransition: null,
-        detachDeletedInstance: (): void => undefined,
+        /** @type {() => void} */
+        detachDeletedInstance: () => undefined,
         requestPostPaintCallback: null,
-        maySuspendCommit: (type, props): boolean => false,
-        maySuspendCommitOnUpdate: (type, oldProps, newProps): boolean => false,
-        maySuspendCommitInSyncRender: (type, props): boolean => false,
+        /** @type {(type: string, props: unknown) => boolean} */
+        maySuspendCommit: (type, props) => false,
+        /** @type {(type: string, oldProps: unknown, newProps: unknown) => boolean} */
+        maySuspendCommitOnUpdate: (type, oldProps, newProps) => false,
+        /** @type {(type: string, props: unknown) => boolean} */
+        maySuspendCommitInSyncRender: (type, props) => false,
         preloadInstance: null, // (instance: Instance, type, props) => boolean
         startSuspendingCommit: null,
         suspendInstance: null,
@@ -105,16 +118,18 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
         resetFormInstance: null,
         bindToConsole: null,
 
-        // -------------------
-        //      Mutation
-        //     (optional)
-        // -------------------
+        /*
+         * -------------------
+         *      Mutation
+         *     (optional)
+         * -------------------
+         */
         /** @type {(parentInstance: Instance, child: Instance) => void} */
         appendChild: (parentInstance, child) => {
             parentInstance.appendChild(child);
             child.setParent(parentInstance);
         },
-        /** @type {(container: unknown, child: Instance) => void} */
+        /** @type {(container: Instance, child: Instance) => void} */
         appendChildToContainer: (container, child) => {
             child.setDepth(1, 'appendChildToContainer')
             container.appendChild(child);
@@ -193,151 +208,163 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
         commitNewChildToFragmentInstance: null,
         deleteChildFromFragmentInstance: null,
 
-        // -------------------
-        //      Microtasks
-        //     (optional)
-        // -------------------
+        /*
+         * -------------------
+         *      Microtasks
+         *     (optional)
+         * -------------------
+         */
         supportsMicrotasks: true,
         scheduleMicrotask:
             typeof queueMicrotask === 'function'
                 ? queueMicrotask
                 : typeof localPromise !== 'undefined'
                     ? (callback) => localPromise.resolve(null).then(callback).catch(handleErrorInNextTick)
-                    : scheduleTimeout
-        }
+                    : scheduleTimeout,
+    }
 
     return hostConfig;
 }
 
 
-// -------------------
-//      Test selectors
-//     (optional)
-// -------------------
 /*
-export const supportsTestSelectors = $$$config.supportsTestSelectors;
-export const findFiberRoot = $$$config.findFiberRoot;
-export const getBoundingRect = $$$config.getBoundingRect;
-export const getTextContent = $$$config.getTextContent;
-export const isHiddenSubtree = $$$config.isHiddenSubtree;
-export const matchAccessibilityRole = $$$config.matchAccessibilityRole;
-export const setFocusIfFocusable = $$$config.setFocusIfFocusable;
-export const setupIntersectionObserver = $$$config.setupIntersectionObserver;
-*/
+ * -------------------
+ *      Test selectors
+ *     (optional)
+ * -------------------
+ */
+/*
+ *export const supportsTestSelectors = $$$config.supportsTestSelectors;
+ *export const findFiberRoot = $$$config.findFiberRoot;
+ *export const getBoundingRect = $$$config.getBoundingRect;
+ *export const getTextContent = $$$config.getTextContent;
+ *export const isHiddenSubtree = $$$config.isHiddenSubtree;
+ *export const matchAccessibilityRole = $$$config.matchAccessibilityRole;
+ *export const setFocusIfFocusable = $$$config.setFocusIfFocusable;
+ *export const setupIntersectionObserver = $$$config.setupIntersectionObserver;
+ */
 
-// -------------------
-//     Persistence
-//     (optional)
-// -------------------
 /*
-export const cloneInstance = $$$config.cloneInstance;
-export const createContainerChildSet = $$$config.createContainerChildSet;
-export const appendChildToContainerChildSet =
-  $$$config.appendChildToContainerChildSet;
-export const finalizeContainerChildren = $$$config.finalizeContainerChildren;
-export const replaceContainerChildren = $$$config.replaceContainerChildren;
-export const cloneHiddenInstance = $$$config.cloneHiddenInstance;
-export const cloneHiddenTextInstance = $$$config.cloneHiddenTextInstance;
-*/
+ * -------------------
+ *     Persistence
+ *     (optional)
+ * -------------------
+ */
+/*
+ *export const cloneInstance = $$$config.cloneInstance;
+ *export const createContainerChildSet = $$$config.createContainerChildSet;
+ *export const appendChildToContainerChildSet =
+ *  $$$config.appendChildToContainerChildSet;
+ *export const finalizeContainerChildren = $$$config.finalizeContainerChildren;
+ *export const replaceContainerChildren = $$$config.replaceContainerChildren;
+ *export const cloneHiddenInstance = $$$config.cloneHiddenInstance;
+ *export const cloneHiddenTextInstance = $$$config.cloneHiddenTextInstance;
+ */
 
-// -------------------
-//     Hydration
-//     (optional)
-// -------------------
 /*
-export const isSuspenseInstancePending = $$$config.isSuspenseInstancePending;
-export const isSuspenseInstanceFallback = $$$config.isSuspenseInstanceFallback;
-export const getSuspenseInstanceFallbackErrorDetails =
-  $$$config.getSuspenseInstanceFallbackErrorDetails;
-export const registerSuspenseInstanceRetry =
-  $$$config.registerSuspenseInstanceRetry;
-export const canHydrateFormStateMarker = $$$config.canHydrateFormStateMarker;
-export const isFormStateMarkerMatching = $$$config.isFormStateMarkerMatching;
-export const getNextHydratableSibling = $$$config.getNextHydratableSibling;
-export const getNextHydratableSiblingAfterSingleton =
-  $$$config.getNextHydratableSiblingAfterSingleton;
-export const getFirstHydratableChild = $$$config.getFirstHydratableChild;
-export const getFirstHydratableChildWithinContainer =
-  $$$config.getFirstHydratableChildWithinContainer;
-export const getFirstHydratableChildWithinActivityInstance =
-  $$$config.getFirstHydratableChildWithinActivityInstance;
-export const getFirstHydratableChildWithinSuspenseInstance =
-  $$$config.getFirstHydratableChildWithinSuspenseInstance;
-export const getFirstHydratableChildWithinSingleton =
-  $$$config.getFirstHydratableChildWithinSingleton;
-export const canHydrateInstance = $$$config.canHydrateInstance;
-export const canHydrateTextInstance = $$$config.canHydrateTextInstance;
-export const canHydrateActivityInstance = $$$config.canHydrateActivityInstance;
-export const canHydrateSuspenseInstance = $$$config.canHydrateSuspenseInstance;
-export const hydrateInstance = $$$config.hydrateInstance;
-export const hydrateTextInstance = $$$config.hydrateTextInstance;
-export const hydrateActivityInstance = $$$config.hydrateActivityInstance;
-export const hydrateSuspenseInstance = $$$config.hydrateSuspenseInstance;
-export const getNextHydratableInstanceAfterActivityInstance =
-  $$$config.getNextHydratableInstanceAfterActivityInstance;
-export const getNextHydratableInstanceAfterSuspenseInstance =
-  $$$config.getNextHydratableInstanceAfterSuspenseInstance;
-export const commitHydratedInstance = $$$config.commitHydratedInstance;
-export const commitHydratedContainer = $$$config.commitHydratedContainer;
-export const commitHydratedActivityInstance =
-  $$$config.commitHydratedActivityInstance;
-export const commitHydratedSuspenseInstance =
-  $$$config.commitHydratedSuspenseInstance;
-export const finalizeHydratedChildren = $$$config.finalizeHydratedChildren;
-export const flushHydrationEvents = $$$config.flushHydrationEvents;
-export const clearActivityBoundary = $$$config.clearActivityBoundary;
-export const clearSuspenseBoundary = $$$config.clearSuspenseBoundary;
-export const clearActivityBoundaryFromContainer =
-  $$$config.clearActivityBoundaryFromContainer;
-export const clearSuspenseBoundaryFromContainer =
-  $$$config.clearSuspenseBoundaryFromContainer;
-export const hideDehydratedBoundary = $$$config.hideDehydratedBoundary;
-export const unhideDehydratedBoundary = $$$config.unhideDehydratedBoundary;
-export const shouldDeleteUnhydratedTailInstances =
-  $$$config.shouldDeleteUnhydratedTailInstances;
-export const diffHydratedPropsForDevWarnings =
-  $$$config.diffHydratedPropsForDevWarnings;
-export const diffHydratedTextForDevWarnings =
-  $$$config.diffHydratedTextForDevWarnings;
-export const describeHydratableInstanceForDevWarnings =
-  $$$config.describeHydratableInstanceForDevWarnings;
-export const validateHydratableInstance = $$$config.validateHydratableInstance;
-export const validateHydratableTextInstance =
-  $$$config.validateHydratableTextInstance;
-*/
+ * -------------------
+ *     Hydration
+ *     (optional)
+ * -------------------
+ */
+/*
+ *export const isSuspenseInstancePending = $$$config.isSuspenseInstancePending;
+ *export const isSuspenseInstanceFallback = $$$config.isSuspenseInstanceFallback;
+ *export const getSuspenseInstanceFallbackErrorDetails =
+ *  $$$config.getSuspenseInstanceFallbackErrorDetails;
+ *export const registerSuspenseInstanceRetry =
+ *  $$$config.registerSuspenseInstanceRetry;
+ *export const canHydrateFormStateMarker = $$$config.canHydrateFormStateMarker;
+ *export const isFormStateMarkerMatching = $$$config.isFormStateMarkerMatching;
+ *export const getNextHydratableSibling = $$$config.getNextHydratableSibling;
+ *export const getNextHydratableSiblingAfterSingleton =
+ *  $$$config.getNextHydratableSiblingAfterSingleton;
+ *export const getFirstHydratableChild = $$$config.getFirstHydratableChild;
+ *export const getFirstHydratableChildWithinContainer =
+ *  $$$config.getFirstHydratableChildWithinContainer;
+ *export const getFirstHydratableChildWithinActivityInstance =
+ *  $$$config.getFirstHydratableChildWithinActivityInstance;
+ *export const getFirstHydratableChildWithinSuspenseInstance =
+ *  $$$config.getFirstHydratableChildWithinSuspenseInstance;
+ *export const getFirstHydratableChildWithinSingleton =
+ *  $$$config.getFirstHydratableChildWithinSingleton;
+ *export const canHydrateInstance = $$$config.canHydrateInstance;
+ *export const canHydrateTextInstance = $$$config.canHydrateTextInstance;
+ *export const canHydrateActivityInstance = $$$config.canHydrateActivityInstance;
+ *export const canHydrateSuspenseInstance = $$$config.canHydrateSuspenseInstance;
+ *export const hydrateInstance = $$$config.hydrateInstance;
+ *export const hydrateTextInstance = $$$config.hydrateTextInstance;
+ *export const hydrateActivityInstance = $$$config.hydrateActivityInstance;
+ *export const hydrateSuspenseInstance = $$$config.hydrateSuspenseInstance;
+ *export const getNextHydratableInstanceAfterActivityInstance =
+ *  $$$config.getNextHydratableInstanceAfterActivityInstance;
+ *export const getNextHydratableInstanceAfterSuspenseInstance =
+ *  $$$config.getNextHydratableInstanceAfterSuspenseInstance;
+ *export const commitHydratedInstance = $$$config.commitHydratedInstance;
+ *export const commitHydratedContainer = $$$config.commitHydratedContainer;
+ *export const commitHydratedActivityInstance =
+ *  $$$config.commitHydratedActivityInstance;
+ *export const commitHydratedSuspenseInstance =
+ *  $$$config.commitHydratedSuspenseInstance;
+ *export const finalizeHydratedChildren = $$$config.finalizeHydratedChildren;
+ *export const flushHydrationEvents = $$$config.flushHydrationEvents;
+ *export const clearActivityBoundary = $$$config.clearActivityBoundary;
+ *export const clearSuspenseBoundary = $$$config.clearSuspenseBoundary;
+ *export const clearActivityBoundaryFromContainer =
+ *  $$$config.clearActivityBoundaryFromContainer;
+ *export const clearSuspenseBoundaryFromContainer =
+ *  $$$config.clearSuspenseBoundaryFromContainer;
+ *export const hideDehydratedBoundary = $$$config.hideDehydratedBoundary;
+ *export const unhideDehydratedBoundary = $$$config.unhideDehydratedBoundary;
+ *export const shouldDeleteUnhydratedTailInstances =
+ *  $$$config.shouldDeleteUnhydratedTailInstances;
+ *export const diffHydratedPropsForDevWarnings =
+ *  $$$config.diffHydratedPropsForDevWarnings;
+ *export const diffHydratedTextForDevWarnings =
+ *  $$$config.diffHydratedTextForDevWarnings;
+ *export const describeHydratableInstanceForDevWarnings =
+ *  $$$config.describeHydratableInstanceForDevWarnings;
+ *export const validateHydratableInstance = $$$config.validateHydratableInstance;
+ *export const validateHydratableTextInstance =
+ *  $$$config.validateHydratableTextInstance;
+ */
 
-// -------------------
-//     Resources
-//     (optional)
-// -------------------
 /*
-export type HoistableRoot = mixed;
-export type Resource = mixed;
-export const supportsResources = $$$config.supportsResources;
-export const isHostHoistableType = $$$config.isHostHoistableType;
-export const getHoistableRoot = $$$config.getHoistableRoot;
-export const getResource = $$$config.getResource;
-export const acquireResource = $$$config.acquireResource;
-export const releaseResource = $$$config.releaseResource;
-export const hydrateHoistable = $$$config.hydrateHoistable;
-export const mountHoistable = $$$config.mountHoistable;
-export const unmountHoistable = $$$config.unmountHoistable;
-export const createHoistableInstance = $$$config.createHoistableInstance;
-export const prepareToCommitHoistables = $$$config.prepareToCommitHoistables;
-export const mayResourceSuspendCommit = $$$config.mayResourceSuspendCommit;
-export const preloadResource = $$$config.preloadResource;
-export const suspendResource = $$$config.suspendResource;
-*/
+ * -------------------
+ *     Resources
+ *     (optional)
+ * -------------------
+ */
+/*
+ *export type HoistableRoot = mixed;
+ *export type Resource = mixed;
+ *export const supportsResources = $$$config.supportsResources;
+ *export const isHostHoistableType = $$$config.isHostHoistableType;
+ *export const getHoistableRoot = $$$config.getHoistableRoot;
+ *export const getResource = $$$config.getResource;
+ *export const acquireResource = $$$config.acquireResource;
+ *export const releaseResource = $$$config.releaseResource;
+ *export const hydrateHoistable = $$$config.hydrateHoistable;
+ *export const mountHoistable = $$$config.mountHoistable;
+ *export const unmountHoistable = $$$config.unmountHoistable;
+ *export const createHoistableInstance = $$$config.createHoistableInstance;
+ *export const prepareToCommitHoistables = $$$config.prepareToCommitHoistables;
+ *export const mayResourceSuspendCommit = $$$config.mayResourceSuspendCommit;
+ *export const preloadResource = $$$config.preloadResource;
+ *export const suspendResource = $$$config.suspendResource;
+ */
 
-// -------------------
-//     Singletons
-//     (optional)
-// -------------------
 /*
-export const supportsSingletons = $$$config.supportsSingletons;
-export const resolveSingletonInstance = $$$config.resolveSingletonInstance;
-export const acquireSingletonInstance = $$$config.acquireSingletonInstance;
-export const releaseSingletonInstance = $$$config.releaseSingletonInstance;
-export const isHostSingletonType = $$$config.isHostSingletonType;
-export const isSingletonScope = $$$config.isSingletonScope;
-*/
+ * -------------------
+ *     Singletons
+ *     (optional)
+ * -------------------
+ */
+/*
+ *export const supportsSingletons = $$$config.supportsSingletons;
+ *export const resolveSingletonInstance = $$$config.resolveSingletonInstance;
+ *export const acquireSingletonInstance = $$$config.acquireSingletonInstance;
+ *export const releaseSingletonInstance = $$$config.releaseSingletonInstance;
+ *export const isHostSingletonType = $$$config.isHostSingletonType;
+ *export const isSingletonScope = $$$config.isSingletonScope;
+ */

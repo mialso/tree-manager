@@ -1,4 +1,4 @@
-/** @import {Event, Lifecycle, TreeNode, isInput, InitInput} from './types' */
+/** @import {IsInput, InitInput} from './types' */
 import { LOG_LEVEL } from './log-level'
 
 /** @type {IsInput} */

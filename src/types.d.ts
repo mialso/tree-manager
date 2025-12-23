@@ -14,15 +14,15 @@ export type NodeState<P = unknown> = {
     type: string
     name?: string
     children: TreeNode<P>[]
-    parent: unknown
+    parent: TreeNode<P> | null
     depth: number
     logSeverity: LogSeverity
 }
 
-export type TreeNode<P = unknown> = {
+export type TreeNode<P = unknown, Ext = {}> = {
     type: string
-    getChildren: () => TreeNode<unknown>[]
-    getParent: () => unknown
+    getChildren: () => Array<TreeNode<unknown> & Ext>
+    getParent: () => TreeNode<unknown> | null
     setParent: (node: TreeNode<unknown>) => void
     setName: (name: string) => void
     getDisplayName: (nameOnly?: boolean) => string
@@ -41,8 +41,30 @@ export type TreeNodeExt<P = unknown> = Partial<{
     logSeverity: LogSeverity
 }>
 
-export type TreeNodeCreate<P> = (config: NodeConfig) => TreeNode<P>
-export type TreeNodeInit<P> = (ext?: TreeNodeExt<P>) => TreeNodeCreate<P>
+export type TreeNodeCreate<P = unknown> = (config: NodeConfig) => TreeNode<P>
+export type TreeNodeInit<P = unknown> = (ext?: TreeNodeExt<P>) => TreeNodeCreate<P>
+
+
+export type LifecycleNodeExt<P = unknown> = {
+    commitUpdate: (props: P) => void
+    getProps: () => P
+    commitMount: () => void
+    destroy: () => void
+    getNodeLive: () => boolean
+}
+
+export type LifecycleNode<P = unknown> = TreeNode<P, Partial<LifecycleNodeExt<P>>> & LifecycleNodeExt<P>
+
+export type ElementCreate<P> = <B extends LifecycleNode<P>>(base: B) => LifecycleNode<P>
+
+export type LifecycleExt<P = unknown> = Partial<{
+    commitUpdate: (props: P) => void
+    commitMount: () => void
+    destroy: () => void
+    getName?: () => string
+}>
+
+export type InitLifecycle = <P extends { name?: string }>(props: P, ext?: LifecycleExt<P>) => ElementCreate<P>
 
 export type Input = {
     capture: (data: Event) => void
@@ -52,30 +74,8 @@ export type InputProps = Partial<{
     onData: (data: Event) => boolean
     onCtrl: (data: Event) => boolean
 }>
-export type isInput = (node: any) => node is Input
-
-export type Base = TreeNode & Lifecycle
-export type InputCreate = <B extends Base>(base: B) => B & Input
+export type IsInput = (node: any) => node is Input
+export type InputCreate = <B extends LifecycleNode>(base: B) => B & Input
 export type InitInput = <P extends InputProps>(ext?: P) => InputCreate<P>
-
-export type Lifecycle<P = unknown> = {
-    commitUpdate: (props: P) => void
-    getProps: () => P
-    commitMount: () => void
-    destroy: () => void
-    getNodeLive: () => boolean
-}
-
-export type ElementCreate<P> = <B extends TreeNode<P>>(base: B) => B & Lifecycle<P>
-// type ElementInit<P> = (p: P) => Partial<Lifecycle<P>>
-//
-export type LifecycleExt<P> = Partial<{
-    commitUpdate: (props: P) => void
-    commitMount: () => void
-    destroy: () => void
-    getName?: () => string
-}>
-
-export type InitLifecycle = <P extends { name?: string }>(props: P, ext?: LifecycleExt<P>) => ElementCreate<P>
 
 export type CreateElement = <P>(type: string, props: unknown, ext?: TreeNodeExt<P> & LifecycleExt<P>) => any
