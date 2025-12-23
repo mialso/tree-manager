@@ -1,5 +1,5 @@
 import React from 'react';
-import { useModuleLifecycle, useModuleInitTimeout, useModuleStatusTimeout } from './manager/hooks';
+import { useModuleLifecycle, useModuleInitTimeout, useModuleStatusTimeout } from './hooks';
 import { PluginOne } from './plugin/PluginOne';
 import { PluginTwo } from './plugin/PluginTwo';
 import { ServiceOne } from './one/ServiceOne';

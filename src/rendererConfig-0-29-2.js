@@ -1,12 +1,12 @@
 // import ReactReconciler from 'react-reconciler';
 /*
-    "react-reconciler": "0.29.2",
-    "react": "18.3.1"
-*/
-import { OWN_PROP_KEYS } from './manager/lifecycle';
-import { createElement } from './manager/element';
+ *"react-reconciler": "0.29.2",
+ *"react": "18.3.1"
+ */
+import { OWN_PROP_KEYS } from './lifecycle';
+import { createElement } from './element';
 
-export const instanceCreator = ({ getInstance }) => (type: string, props, rootContainer, _a, _fiberNode) => {
+export const instanceCreator = ({ getInstance }) => (type, props, rootContainer, _a, _fiberNode) => {
     // console.log(`instanceCreator`, { key: _fiberNode.key })
     const instance = getInstance(type, props, rootContainer)
     if (!instance) {
@@ -68,8 +68,10 @@ export const scheduleTimeout = setTimeout;
 // export const scheduleTimeout = (fn) => fn();
 export const cancelTimeout = clearTimeout;
 const noTimeout = -1;
-// const noTimeout = 1;
-// console.log('moduleRenderer', { noTimeout })
+/*
+ * const noTimeout = 1;
+ * console.log('moduleRenderer', { noTimeout })
+ */
 const isPrimaryRenderer = true;
 
 export const warnsIfNotActing = null;
@@ -120,8 +122,10 @@ export function commitMount(instance, _type, _props, _fiberNode) {
 }
 
 export function commitUpdate(instance, nextProps, _type, prevProps, _internalProps) {
-    // TODO: what's _internalProps
-    // instance.commitUpdate(nextProps);
+    /*
+     * TODO: what's _internalProps
+     * instance.commitUpdate(nextProps);
+     */
     const hasUpdate = Object.keys(nextProps)
         .filter((key) => !OWN_PROP_KEYS.includes(key))
         .reduce((acc, key) => {
@@ -185,8 +189,10 @@ export function createReconciler({ getInstance }) {
         resetAfterCommit,
         shouldSetTextContent,
         getRootHostContext,
-        // TODO
-        // getCurrentEventPriority
+        /*
+         * TODO
+         * getCurrentEventPriority
+         */
         getChildHostContext,
         clearContainer,
         detachDeletedInstance,

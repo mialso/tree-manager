@@ -1,14 +1,17 @@
 {
     "compilerOptions": {
-        "jsx": "react",
-        "module": "commonjs",
+        "checkJs": true,
+        "allowJs": true,
+        "module": "preserve",
+        "moduleResolution": "bundler",
+        "skipLibCheck": true,
         "esModuleInterop": true,
         "strict": false,
-        "outDir": "./build",
+        "noEmit": true,
         "preserveConstEnums": true,
         "target": "es2020"
     },
     "include": [
-        "./types/*", "./src/**/*"
+        "src/*"
     ]
 }

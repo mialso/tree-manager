@@ -1,6 +1,6 @@
 import React from 'react';
-import { dispatch } from '../bus/messageBus';
-import { MODULE_MOUNT, MODULE_UNMOUNT } from '../bus/message';
+import { dispatch } from './bus/messageBus';
+import { MODULE_MOUNT, MODULE_UNMOUNT } from './bus/message';
 
 export function useModuleLifecycle(moduleId) {
     React.useEffect(() => {

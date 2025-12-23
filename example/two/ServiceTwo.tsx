@@ -1,5 +1,5 @@
 import React from 'react';
-import { useModuleLifecycle } from '../manager/hooks';
+import { useModuleLifecycle } from '../hooks';
 
 export const ServiceTwo = ({ children }) => {
     useModuleLifecycle('serviceTwo');
