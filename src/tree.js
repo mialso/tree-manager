@@ -1,5 +1,5 @@
 /** @import {LogSeverity, NodeState, TreeNodeInit} from './types' */
-import { LOG_LEVEL } from './log-level'
+import { LOG_LEVEL } from './log-level.js'
 
 /** @type {(num?: number) => string} */
 export function getSpaces(num = 0) {

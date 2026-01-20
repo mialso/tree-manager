@@ -1,5 +1,5 @@
 /** @import {IsInput, InitInput} from './types' */
-import { LOG_LEVEL } from './log-level'
+import { LOG_LEVEL } from './log-level.js'
 
 /** @type {IsInput} */
 export function isInput(node) {

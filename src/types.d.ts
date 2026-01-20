@@ -8,7 +8,7 @@ export type LogSeverity = 1 | 2 | 3 | 4 | 5 | 6
 
 export type NodeConfig = {
     type: string
-    logSeverity: LogSeverity
+    logSeverity?: LogSeverity
 }
 export type NodeState<P = unknown> = {
     type: string

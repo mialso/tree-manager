@@ -1,7 +1,7 @@
 /** @import {InitLifecycle} from './types' */
 
-import { LOG_LEVEL } from './log-level'
-import { getSpaces } from './tree'
+import { LOG_LEVEL } from './log-level.js'
+import { getSpaces } from './tree.js'
 
 export const OWN_PROP_KEYS = ['children', 'key']
 

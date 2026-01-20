@@ -1,7 +1,7 @@
 /** @import {CreateElement} from './types' */
-import { initLifecycle } from './lifecycle'
-import { initInput } from './input'
-import { initTreeNode } from './tree'
+import { initLifecycle } from './lifecycle.js'
+import { initInput } from './input.js'
+import { initTreeNode } from './tree.js'
 
 // simple util, same as redux "compose"
 export function compose(...funcs) {

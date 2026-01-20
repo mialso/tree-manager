@@ -9,7 +9,7 @@
     "exports": {
         ".": "./src/index.js",
         "./types": "./src/types.d.ts",
-        "./config/*": "./config/*.js"
+        "./config/*": "./src/config/*.js"
     },
     "types": "./src/types.d.ts",
     "files": [

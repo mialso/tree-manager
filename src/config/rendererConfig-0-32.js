@@ -4,8 +4,8 @@
  *"react": "19.1.1"
  */
 /** @import {LifecycleExt, TreeNode} from '../types' */
-import { OWN_PROP_KEYS } from '../lifecycle'
-import { createElement } from '../element'
+import { OWN_PROP_KEYS } from '../lifecycle.js'
+import { createElement } from '../element.js'
 
 /** @typedef {TreeNode & LifecycleExt} Instance */
 
