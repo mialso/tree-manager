@@ -66,16 +66,18 @@ export type LifecycleExt<P = unknown> = Partial<{
 
 export type InitLifecycle = <P extends { name?: string }>(props: P, ext?: LifecycleExt<P>) => ElementCreate<P>
 
-export type Input = {
+export type InputNodeExt = {
     capture: (data: Event) => void
     bubble: (data: Event) => void
 }
-export type InputProps = Partial<{
+export type InputExt = Partial<{
     onData: (data: Event) => boolean
     onCtrl: (data: Event) => boolean
 }>
-export type IsInput = (node: any) => node is Input
 export type InputCreate = <B extends LifecycleNode>(base: B) => B & Input
-export type InitInput = <P extends InputProps>(ext?: P) => InputCreate<P>
+export type InitInput = <P>(ext?: InputExt) => InputCreate<P>
+export type InputNode<P = unknown> = TreeNode<P, Partial<LifecycleNodeExt<P> & InputExt>> & LifecycleNodeExt<P> & InputNodeExt
+
+export type IsInput = (node: any) => node is InputNode
 
 export type CreateElement = <P>(type: string, props: unknown, ext?: TreeNodeExt<P> & LifecycleExt<P>) => any

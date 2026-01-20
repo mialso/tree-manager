@@ -3,15 +3,15 @@
  *"react-reconciler": "0.29.2",
  *"react": "18.3.1"
  */
-import { OWN_PROP_KEYS } from './lifecycle';
-import { createElement } from './element';
+import { OWN_PROP_KEYS } from '../lifecycle'
+import { createElement } from '../element'
 
 export const instanceCreator = ({ getInstance }) => (type, props, rootContainer, _a, _fiberNode) => {
     // console.log(`instanceCreator`, { key: _fiberNode.key })
     const instance = getInstance(type, props, rootContainer)
     if (!instance) {
         console.log(`instanceCreator NO INSTANCE ${type}`)
-        return createElement(type, props);
+        return createElement(type, props)
     }
     return instance
 }
@@ -25,15 +25,15 @@ export const instanceCreator = ({ getInstance }) => (type, props, rootContainer,
  * core
  */
 export function getPublicInstance(instance) {
-    return instance;
+    return instance
 }
 
 export function getRootHostContext(_rootContainer) {
-    return null;
+    return null
 }
 
 export function getChildHostContext(parentHostContext, _type, _rootContainer) {
-    return parentHostContext;
+    return parentHostContext
 }
 
 export function prepareForCommit() {
@@ -47,16 +47,16 @@ export function resetAfterCommit() { }
 export function appendInitialChild(parentInstance, child) {
     // console.log('appendInitialChild')
     child.setParent(parentInstance)
-    return parentInstance.appendChild(child);
+    return parentInstance.appendChild(child)
 }
 
 export function finalizeInitialChildren() {
     // to receive "commitMount"
-    return true;
+    return true
 }
 
 export function shouldSetTextContent() {
-    return false;
+    return false
 }
 
 export function createTextInstance(_text) {
@@ -64,61 +64,61 @@ export function createTextInstance(_text) {
     // return { data: text };
 }
 
-export const scheduleTimeout = setTimeout;
+export const scheduleTimeout = setTimeout
 // export const scheduleTimeout = (fn) => fn();
-export const cancelTimeout = clearTimeout;
-const noTimeout = -1;
+export const cancelTimeout = clearTimeout
+const noTimeout = -1
 /*
  * const noTimeout = 1;
  * console.log('moduleRenderer', { noTimeout })
  */
-const isPrimaryRenderer = true;
+const isPrimaryRenderer = true
 
-export const warnsIfNotActing = null;
-export const supportsMutation = true;
-export const supportsPersistence = false;
-export const supportsHydration = false;
-export const supportsMicrotasks = true;
-export const scheduleMicrotask = queueMicrotask;
-export const supportsTestSelectors = false;
-export const getInstanceFromNode = null;
-export const beforeActiveInstanceBlur = null;
-export const afterActiveInstanceBlur = null;
+export const warnsIfNotActing = null
+export const supportsMutation = true
+export const supportsPersistence = false
+export const supportsHydration = false
+export const supportsMicrotasks = true
+export const scheduleMicrotask = queueMicrotask
+export const supportsTestSelectors = false
+export const getInstanceFromNode = null
+export const beforeActiveInstanceBlur = null
+export const afterActiveInstanceBlur = null
 
 export function preparePortalMount() { };
-export const prepareScopeUpdate = null;
-export const getInstanceFromScope = null;
-export const setCurrentUpdatePriority = null;
-export const getCurrentUpdatePriority = null;
-export const resolveUpdatePriority = null;
-export const shouldAttemptEagerTransition = null;
+export const prepareScopeUpdate = null
+export const getInstanceFromScope = null
+export const setCurrentUpdatePriority = null
+export const getCurrentUpdatePriority = null
+export const resolveUpdatePriority = null
+export const shouldAttemptEagerTransition = null
 export function detachDeletedInstance() { }
-export const requestPostPaintCallback = null;
-export const NotPendingTransition = null;
-export const resetFormInstance = null;
+export const requestPostPaintCallback = null
+export const NotPendingTransition = null
+export const resetFormInstance = null
 
 // TODO: strange, not mentioned in the docs
 export function prepareUpdate(_instance, _type, _prevProps, _nextProps, _rootContainer) {
-    return _nextProps;
+    return _nextProps
 }
 /*
  * mutation
  */
 
 export function appendChild(parentInstance, child) {
-    parentInstance.appendChild(child);
-    child.setParent(parentInstance);
+    parentInstance.appendChild(child)
+    child.setParent(parentInstance)
 }
 export function appendChildToContainer(container, child) {
     child.setDepth(1, 'appendChildToContainer')
-    container.appendChild(child);
+    container.appendChild(child)
     // TODO: should set parent?
 }
 
 export function commitTextUpdate() { }
 
 export function commitMount(instance, _type, _props, _fiberNode) {
-    return instance.commitMount();
+    return instance.commitMount()
 }
 
 export function commitUpdate(instance, nextProps, _type, prevProps, _internalProps) {
@@ -132,26 +132,26 @@ export function commitUpdate(instance, nextProps, _type, prevProps, _internalPro
             return acc || (prevProps[key] !== nextProps[key])
         }, false)
     if (hasUpdate) {
-        instance.commitUpdate(nextProps);
+        instance.commitUpdate(nextProps)
     }
 }
 
 export function insertBefore(parentInstance, newInstance, _beforeInstance) {
-    parentInstance.appendChild(newInstance);
-    newInstance.setParent(parentInstance);
+    parentInstance.appendChild(newInstance)
+    newInstance.setParent(parentInstance)
 }
 export function insertInContainerBefore() { }
 
 export function removeChild(parentInstance, child) {
     // TODO: not expected to traverse child tree here
     if (typeof child.destroy === 'function') {
-        child.destroy();
+        child.destroy()
     }
-    parentInstance.removeChild(child);
+    parentInstance.removeChild(child)
 }
 
 export function removeChildFromContainer(container, child) {
-    removeChild(container, child);
+    removeChild(container, child)
 }
 
 export function resetTextContent() { }
@@ -159,21 +159,21 @@ export function resetTextContent() { }
 export function hideInstance(_instance) {
     // TODO: Suspense
 }
-export const hideTextInstance = null;
+export const hideTextInstance = null
 export function unhideInstance(_instance, _props) {
     // TODO: Suspense
 }
-export const unhideTextInstance = null;
+export const unhideTextInstance = null
 export function clearContainer() { }
 export function maySuspendCommit(_type, _props) {
     // TODO: Suspense
 }
-export const preloadInstance = null;
-export const startSuspendingCommit = null;
-export const suspendInstance = null;
+export const preloadInstance = null
+export const startSuspendingCommit = null
+export const suspendInstance = null
 export function waitForCommitToBeReady() {
     // TODO: Suspense
-    return null;
+    return null
 }
 
 export function createReconciler({ getInstance }) {
@@ -227,7 +227,7 @@ export function createReconciler({ getInstance }) {
         supportsPersistence,
         supportsHydration,
         supportsTestSelectors,
-    };
-    return hostConfig;
+    }
+    return hostConfig
     // return ReactReconciler(hostConfig);
 }

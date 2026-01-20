@@ -3,9 +3,9 @@
  *"react-reconciler": "0.32.0",
  *"react": "19.1.1"
  */
-/** @import {LifecycleExt, TreeNode} from './types' */
-import { OWN_PROP_KEYS } from './lifecycle'
-import { createElement } from './element'
+/** @import {LifecycleExt, TreeNode} from '../types' */
+import { OWN_PROP_KEYS } from '../lifecycle'
+import { createElement } from '../element'
 
 /** @typedef {TreeNode & LifecycleExt} Instance */
 
@@ -15,7 +15,7 @@ export const instanceCreator = ({ getInstance }) => (type, props, rootContainer,
     const instance = getInstance(type, props, rootContainer)
     if (!instance) {
         console.log(`instanceCreator NO INSTANCE ${type}`)
-        return createElement(type, props);
+        return createElement(type, props)
     }
     return instance
 }
@@ -28,12 +28,12 @@ export const cancelTimeout = typeof clearTimeout === 'function' ? clearTimeout :
  *const scheduleTimeout = (fn) => fn()
  *export const cancelTimeout = () => {}
  */
-export const noTimeout = -1;
+export const noTimeout = -1
 const localPromise = typeof Promise === 'function' ? Promise : undefined
 function handleErrorInNextTick(error) {
     setTimeout(() => {
-        throw error;
-    });
+        throw error
+    })
 }
 
 export function createHostConfig ({ getInstance, DefaultEventPriority }) {
@@ -62,7 +62,7 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
         /** @type {(node: Instance, type: string, props: unknown, hostContext: unknown) => boolean} */
         finalizeInitialChildren: (node, type, props, hostContext) => {
             // to receive "commitMount"
-            return true;
+            return true
         },
         /** @type {(type: string, props: unknown) => boolean} */
         shouldSetTextContent: (type, props) => false,
@@ -126,19 +126,19 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
          */
         /** @type {(parentInstance: Instance, child: Instance) => void} */
         appendChild: (parentInstance, child) => {
-            parentInstance.appendChild(child);
-            child.setParent(parentInstance);
+            parentInstance.appendChild(child)
+            child.setParent(parentInstance)
         },
         /** @type {(container: Instance, child: Instance) => void} */
         appendChildToContainer: (container, child) => {
             child.setDepth(1, 'appendChildToContainer')
-            container.appendChild(child);
+            container.appendChild(child)
             // TODO: should set parent?
         },
         commitTextUpdate: () => {},
         /** @type {(instance: Instance, type: string, newProps: unknown, internalInstanceHandle: Object) => void} */
         commitMount: (instance, type, newProps, internalInstanceHandle) => {
-            instance.commitMount();
+            instance.commitMount()
         },
         /** @type {(instance: Instance, type: string, prevProps: unknown, nextProps: unknown, internalInstanceHandle: Object) => void} */
         commitUpdate: (instance, type, prevProps, nextProps, internalInstanceHandle) => {
@@ -149,26 +149,26 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
                     return acc || (prevProps[key] !== nextProps[key])
                 }, false)
             if (hasUpdate) {
-                instance.commitUpdate(nextProps);
+                instance.commitUpdate(nextProps)
             }
         },
         /** @type {(parentInstance: Instance, child: Instance, _beforeChild: Instance) => void} */
         insertBefore: (parentInstance, child, _beforeChild) => {
-            parentInstance.appendChild(child);
-            child.setParent(parentInstance);
+            parentInstance.appendChild(child)
+            child.setParent(parentInstance)
         },
         /** @type {(parentInstance: Instance, child: Instance, _afterChild: Instance) => void} */
         insertInContainerBefore: (parentInstance, child, _afterChild) =>  {
-            parentInstance.appendChild(child);
-            child.setParent(parentInstance);
+            parentInstance.appendChild(child)
+            child.setParent(parentInstance)
         },
         /** @type {(parentInstance: Instance, child: Instance) => void} */
         removeChild: (parentInstance, child) => {
             // TODO: not expected to traverse child tree here
             if (typeof child.destroy === 'function') {
-                child.destroy();
+                child.destroy()
             }
-            parentInstance.removeChild(child);
+            parentInstance.removeChild(child)
         },
         /** @type {() => void} */
         removeChildFromContainer: (...ppp) => {
@@ -223,7 +223,7 @@ export function createHostConfig ({ getInstance, DefaultEventPriority }) {
                     : scheduleTimeout,
     }
 
-    return hostConfig;
+    return hostConfig
 }
 
 
