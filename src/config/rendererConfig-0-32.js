@@ -12,7 +12,7 @@ import { createElement } from '../element.js'
 /** @type {(p: { getInstance: (type: string, props: unknown, rootContainer: Instance) => Instance }) => (type: string, props: unknown, rootContainer: Instance, hostContext: unknown, internalInstanceHandle: Object) => Instance} */
 export const instanceCreator = ({ getInstance }) => (type, props, rootContainer, hostContext, internalInstanceHandle) => {
     // console.log(`instanceCreator`, { key: _fiberNode.key })
-    const instance = getInstance(type, props, rootContainer)
+    const instance = getInstance(type, props, rootContainer, hostContext)
     if (!instance) {
         console.log(`instanceCreator NO INSTANCE ${type}`)
         return createElement(type, props)
@@ -36,14 +36,14 @@ function handleErrorInNextTick(error) {
     })
 }
 
-export function createHostConfig ({ getInstance, DefaultEventPriority }) {
+export function createHostConfig ({ getInstance, DefaultEventPriority, context }) {
     const hostConfig = {
         rendererVersion: '1.0.0',
         rendererPackageName: 'tree-manager',
         extraDevToolsConfig: null,
 
         getPublicInstance: (instance) => instance,
-        getRootHostContext: (_rootInstance) => hostContext,
+        getRootHostContext: (_rootInstance) => context ? Object.freeze(context) : hostContext,
         getChildHostContext: (parentContext, _type) => parentContext,
         prepareForCommit: (_containerInfo) => null,
         resetAfterCommit: () => undefined,

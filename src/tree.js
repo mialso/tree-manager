@@ -103,6 +103,7 @@ export const initTreeNode = (ext) => ({ type }) => {
             state.children = state.children.filter((item) => item === child)
             ext?.removeChild && ext.removeChild(child)
         },
+        getContext: (key) => ext?.context ? ext.context[key] : undefined,
         /** @type {(logSeverity: LogSeverity) => LogSeverity} */
         setLogSeverity: (logSeverity) => {
             if (!ext?.logSeverity) {

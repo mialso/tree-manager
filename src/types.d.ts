@@ -33,12 +33,14 @@ export type TreeNode<P = unknown, Ext = {}> = {
     setLogSeverity: (logSeverity: LogSeverity) => LogSeverity
     getLogSeverity: () => LogSeverity
     log: (level: LogSeverity, message: string, ...rest: unknown[]) => void
+    getContext: (key: string) => Record<string, unknown>
 }
 
 export type TreeNodeExt<P = unknown> = Partial<{
     appendChild: (node: TreeNode<P>) => void
     removeChild: (node: TreeNode<P>) => void
     logSeverity: LogSeverity
+    context: Record<string, unknown>
 }>
 
 export type TreeNodeCreate<P = unknown> = (config: NodeConfig) => TreeNode<P>
