@@ -134,6 +134,7 @@ export function createHostConfig ({ getInstance, DefaultEventPriority, context }
             child.setDepth(1, 'appendChildToContainer')
             container.appendChild(child)
             // TODO: should set parent?
+            child.setParent(container)
         },
         commitTextUpdate: () => {},
         /** @type {(instance: Instance, type: string, newProps: unknown, internalInstanceHandle: Object) => void} */

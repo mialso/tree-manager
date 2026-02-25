@@ -21,10 +21,10 @@ export function compose(...funcs) {
 }
 
 /** @type {CreateElement} */
-export const createElement = (type, props, ext) => {
+export const createElement = (type, props, ext = {}) => {
     return compose(
-        initInput(props),
-        initLifecycle(props, {}),
-        initTreeNode(ext || {}),
+        initInput(ext),
+        initLifecycle(props, ext),
+        initTreeNode(ext),
     )({ type })
 }

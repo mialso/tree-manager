@@ -36,6 +36,7 @@ export const initInput = (ext) => (base) => {
             }
             const prevent = !!(ext && ext.onData && ext.onData(data))
             if (prevent) {
+                base.log(LOG_LEVEL.TRACE, 'bubble prevent=', data)
                 return
             }
             base.log(LOG_LEVEL.TRACE, 'bubble data=', data)
